@@ -1,0 +1,47 @@
+<!--index.wxml-->
+<view class="flex-wrap header">
+  <input
+    placeholder="输入股票代码" 
+    value="{{draft}}" 
+    bindinput="updateDraft" 
+    class="new-todo"/>
+  <text style="display: {{draft ? 'inline': 'none'}}" class="add tappable" ontap="addTodo">GO</text>
+</view>
+<view>
+  <text class="errmsg" > {{errmsg}}</text>
+</view>
+<view class="container-index">
+<!--
+  <view  bindtap="bindViewTap" class="userinfo">
+    <image class="userinfo-avatar" src="{{userInfo.avatarUrl}}" background-size="cover"></image>
+    <text class="userinfo-nickname">{{userInfo.nickName}}</text>
+  </view>-->
+  <view class="">{{stockCode1}}({{stockCode}})</view>
+  <view class="usermotto">
+    <text class="user-motto-now" style="color:{{nowStyle.nowColor}};" >{{test.data.match}}</text>
+    <text class="user-motto" style="color:{{nowStyle.nowColor}};" >{{nowStyle.zhangfu1}}</text>
+    <text class="user-motto" style="color:{{nowStyle.nowColor}};" >{{nowStyle.zhangfu2}}</text>
+  </view>
+  <view class="" >
+    <block wx:for="{{test.data.buyPankou}}" wx:for-item="buy" wx:key="*this">
+      <view class="price-volume">
+
+        <view class="sell-price">
+          <text class="width-item">卖{{num10[index + 1]}}</text>
+          <text class="width-item" style="color:{{sellColor10[index]}};">{{test.data.sellPankou[index].price}}</text>
+        </view>
+        <view class="sell-volume">
+          <text class="width-item">{{test.data.sellPankou[index].volume}}</text>
+        </view>
+        <view class="sell-price">
+          <text style="width:150rpx;" class="width-item">买{{num10[index + 1]}}</text>
+          <text class="width-item" style="color:{{buyColor10[index]}};">{{buy.price}}</text>
+        </view>
+        <view class="sell-volume">
+          <text class="width-item">{{buy.volume}}</text>
+        </view>
+      </view>
+    </block>
+  </view>
+
+</view>
