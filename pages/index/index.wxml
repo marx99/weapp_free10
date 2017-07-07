@@ -1,7 +1,7 @@
 <!--index.wxml-->
 <view class="flex-wrap header">
   <input
-    placeholder="输入股票代码" 
+    placeholder="输入6位数股票代码" 
     value="{{draft}}" 
     bindinput="updateDraft" 
     class="new-todo"/>
@@ -10,18 +10,24 @@
 <view>
   <text class="errmsg" > {{errmsg}}</text>
 </view>
+<view >
+  <block wx:for="{{history}}" wx:for-item="history" wx:key="*this">
+    <text id='{{history.code}}' class="user-motto" ontap="getHistory" >{{history.name}}</text>
+  </block>
+</view>  
 <view class="container-index">
 <!--
   <view  bindtap="bindViewTap" class="userinfo">
     <image class="userinfo-avatar" src="{{userInfo.avatarUrl}}" background-size="cover"></image>
     <text class="userinfo-nickname">{{userInfo.nickName}}</text>
   </view>-->
-  <view class="">{{stockCode1}}({{stockCode}})</view>
+  <view class="">{{stockM}}({{stockCode}})</view>
   <view class="usermotto">
     <text class="user-motto-now" style="color:{{nowStyle.nowColor}};" >{{test.data.match}}</text>
     <text class="user-motto" style="color:{{nowStyle.nowColor}};" >{{nowStyle.zhangfu1}}</text>
     <text class="user-motto" style="color:{{nowStyle.nowColor}};" >{{nowStyle.zhangfu2}}</text>
   </view>
+  <view class=""><text class="user-motto" >{{date}}</text></view>  
   <view class="" >
     <block wx:for="{{test.data.buyPankou}}" wx:for-item="buy" wx:key="*this">
       <view class="price-volume">

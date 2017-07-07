@@ -37,7 +37,7 @@
 .width-item {
   width: 100rpx;
   margin: 10rpx;
-  font-size: 15px;
+  font-size: 14px;
 }
 .left-300{
   left:500rpx;
@@ -55,10 +55,10 @@
 }
 
 .sell-price{
-  width:210rpx;
+  width:230rpx;
 }
 .sell-volume{
-  width:110rpx;
+  width:120rpx;
 }
 /**app.wxss**/
 .container-index {

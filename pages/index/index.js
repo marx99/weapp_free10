@@ -1,6 +1,7 @@
 const AV = require('../../libs/av-weapp-min.js');
 var stocklist = require('../../utils/stocklist.js')
 var util = require('../../utils/util.js')
+var moment = require('../../utils/moment.js')
 
 //index.js
 //获取应用实例
@@ -26,11 +27,12 @@ Page({
     buyColor10:[],
     sellColor10:[],
     nowStyle:{},
-    stockM:'pingan',
+    stockM:'',
     stockCode:'',
     stockCode1:'',
     draft:'',
     errmsg:'',
+    history: [{ 'code': '000001', 'name': '平安银行' }, { 'code': '600519','name':'贵州茅台'}],
   },
   //事件处理函数
   bindViewTap: function() {
@@ -52,11 +54,10 @@ Page({
       })
     })
     that.getlf('000001', that)
-    //that.getlf(that)
-    //that.getStockName('')
+    that.getStockName('000001', that)
   },
   getlf: function (code,that){
-    
+    var result = false;
     wx.request({
       url: 'https://app.leverfun.com/timelyInfo/timelyOrderForm',
       data: { stockCode: code },
@@ -68,20 +69,20 @@ Page({
           that.setData({
             errmsg: '取得失败'
           })
-          return
+          return result
         }
         else if (res.data.data.buyPankou[0] == null){
           that.setData({
             errmsg: '取得失败'
           })
-          return
+          return result
         }
 
         for (var i = 0; i < res.data.data.buyPankou.length ;i++){
             buyColor.push(that.getColor(Math.round(res.data.data.preClose * 1000) / 1000,res.data.data.buyPankou[i].price))
             sellColor.push(that.getColor(Math.round(res.data.data.preClose * 1000) / 1000, res.data.data.sellPankou[i].price))
         }
-        var listT = stocklist.getStockList()
+
         //console.log(listT)
         that.setData({
           test: res.data,
@@ -89,20 +90,26 @@ Page({
           sellColor10: sellColor,
           nowStyle: that.getNowStyle(res.data.data),
           stockCode: code,
-          stockCode1: listT[code],
-          stockM: 'asdf',
+          date: moment().format('MM-DD HH:mm:ss'),
+          stockM: that.data.stockCode1,
         })
         //that.getStockName(code)
         clearTimeout(t)
-        t = setTimeout(function () { that.getlf(code, that); }, 5000)
+        if (that.checkTradeTime()){
+          t = setTimeout(function () { that.getlf(code, that); }, 5000)
+        }
+
+        result = true;
       },
       fail: function (res) {
-        console.log(res.data)
+        //console.log(res.data)
         that.setData({
           errmsg: '取得失败'
         })
       }
     })
+
+    return result;
   },
   getColor: function (preClose, newPrice) {
     if(newPrice==0) {
@@ -148,15 +155,56 @@ Page({
     }else{
       that.setData({ errmsg: '' })
     }
-    console.log(code)
+    //console.log(code)
+    clearTimeout(t)
     that.getlf(code,that)
+    that.getStockName(code, that)
+
+    //保存最近五个搜索履历
+    var h = that.data.history
+    var d = { 'code': code, 'name': that.data.stockCode1 }
+    var flg = false
+    for (var i=0;i<h.length;i++){
+      if (h[i].code== code){
+        //搜索履历中存在，不再添加
+        flg=true
+      }
+    }
+    if (!flg){
+      h.push(d)
+      if (h.length > 5) {
+        h.splice(0, 1)
+      }
+      that.setData({
+        history: h,
+      })
+    }
+  },
+  getHistory:function(e){
+    //console.log(e.currentTarget.id)
+    var that = this
+    clearTimeout(t)
+    that.getlf(e.currentTarget.id, that)
+    that.getStockName(e.currentTarget.id, that)
   },
   updateDraft: function (e) {
     this.setData({ draft: e.detail.value })
   },
-  getStockName: function (code) {
-    var query = new AV.Query('Stock');
+  getStockName: function (code,that) {
+    var listT = stocklist.getStockList()
+    //console.log(listT[code])
+    if (listT[code]) {
+      that.setData({
+        stockCode1: listT[code],
+      })
+    }else{
+      that.setData({
+        stockCode1: '****',
+      })
+    }
     /*
+    var query = new AV.Query('Stock');
+    
     query.equalTo('code', code);
     query.select(['name']);
     query.first().then(function (name) {
@@ -176,5 +224,16 @@ Page({
       .catch(console.error);
     console.log(name)
     */
+  },
+  checkTradeTime:function (){
+    var myDate = new Date();
+    var arr =['9', '10', '11', '13', '14'];
+    for(var k = 0, length = arr.length; k<length; k++)
+    {
+      if (myDate.getHours() == arr[k]) {
+        return true;
+      }
+    }
+    return false;
   },
 })
